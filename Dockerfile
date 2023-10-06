@@ -32,6 +32,12 @@ RUN luarocks make
 RUN luarocks pack kong-plugin-jwt-keycloak ${JWT_PLUGIN_VERSION} \
     && luarocks install kong-plugin-jwt-keycloak-${JWT_PLUGIN_VERSION}.all.rock
 
-RUN luarocks remove lua-resty-session 4.0.4-1 --force
+RUN isntalled_versions=$(luarocks list --porcelain lua-resty-session) \
+    && num_installed_versions=$(echo "$installed_versions" | wc -l) \
+    && if [ "$num_installed_versions" -gt 1]; then \
+    version_to_remove=$(echo "$installed_versions" | head -n 1); \
+    echo "Remove $version_to_remove..."; \
+    luarocks remove $(echo "$version_to_remove" | awk '{print $1 " " $2}') --force; \
+fi
 
 USER kong
